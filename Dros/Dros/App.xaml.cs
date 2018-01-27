@@ -1,7 +1,8 @@
 ﻿using System;
-
+using Dros.Models;
 using Dros.Views;
 using Xamarin.Forms;
+using System.Linq;
 
 namespace Dros
 {
@@ -11,7 +12,7 @@ namespace Dros
 		public App ()
 		{
 			InitializeComponent();
-
+            Console.WriteLine(Database.Instance.All<Author>().FirstOrDefault().Name);
 
             MainPage = new MainPage();
         }

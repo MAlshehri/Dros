@@ -16,31 +16,32 @@ namespace Dros
         {
             get
             {
-                if(database == null)
+                if (database == null)
                 {
-                    var assembly = typeof(Database).GetTypeInfo().Assembly;
-                    var bytes = GetEmbeddedResourceBytes(assembly, "dros.realm");
-
 #if __IOS__
-var resourcePrefix = "WorkingWithFiles.iOS.";
+                    string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    dbPath = Path.Combine(dbPath, "..", "Library", "Databases");
+                    dbPath = Path.Combine(dbPath, "dros.realm");
 #endif
 #if __ANDROID__
-                    var resourcePrefix = "WorkingWithFiles.Droid.";
+                    string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    dbPath = Path.Combine(dbPath, "dros.realm");
 #endif
-
+                    var assembly = typeof(Database).GetTypeInfo().Assembly;
+                    SaveEmbeddedResourceLocally(assembly, "dros.realm", dbPath);
+                    database = Realm.GetInstance(dbPath);
                 }
                 return database;
             }
         }
 
-        public static byte[] GetEmbeddedResourceBytes(Assembly assembly, string resourceFileName)
+        public static void SaveEmbeddedResourceLocally(Assembly assembly, string resourceFileName, string path)
         {
             var stream = GetEmbeddedResourceStream(assembly, resourceFileName);
-
-            using (var memoryStream = new MemoryStream())
+            using (var fileStream = File.Create(path))
             {
-                stream.CopyTo(memoryStream);
-                return memoryStream.ToArray();
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.CopyTo(fileStream);
             }
         }
 
